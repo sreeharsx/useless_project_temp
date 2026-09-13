@@ -152,10 +152,14 @@ ANY ──[Consecutive Misses]──► TAUNT (Mocking Shakes)
 ## Project Documentation
 
 ### Screenshots
-*(Add screenshots showing Main Menu, Slingshot Gameplay, and Victory Screen)*
 
 1. **Main Menu**: Malayalam title "വള്ളിപിടുത്തം" with animated vine background.
+ <img width="1283" height="753" alt="MENU" src="https://github.com/user-attachments/assets/3154d18b-e23f-4c29-b079-56fd17acb903" />
 2. **Gameplay**: Slingshot aiming with elastic band, Kerala rubber trees, and glassmorphic HUD.
+<img width="1277" height="750" alt="2" src="https://github.com/user-attachments/assets/2732d593-9db0-4d74-96c3-d1c7865b9eec" />
+<img width="1277" height="752" alt="3" src="https://github.com/user-attachments/assets/7eae1086-daf3-47d2-b615-a7c5eb528d76" />
+
+
 3. **Level 10 Victory Screen**: Golden Valli trophy with celebratory stats and Malayalam victory banner.
 
 ---
