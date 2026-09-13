@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://level10"]
+[gd_scene load_steps=10 format=3 uid="uid://level10"]
 
 [ext_resource type="Script" path="res://scenes/levels/Level10.gd" id="1_l10"]
 [ext_resource type="PackedScene" path="res://scenes/player/PlayerHand.tscn" id="2_ph"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/hazards/KSRTCBus.tscn" id="5_bus"]
 [ext_resource type="PackedScene" path="res://scenes/environment/MonsoonModifier.tscn" id="6_mm"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="7_hud"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bg.png" id="bg_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/slingshot.png" id="ss_tex"]
 
 [sub_resource type="RectangleShape2D" id="GroundShape"]
 size = Vector2(1280, 24)
@@ -14,11 +16,17 @@ size = Vector2(1280, 24)
 [node name="Level10" type="Node2D"]
 script = ExtResource("1_l10")
 
-[node name="Background" type="ColorRect" parent="."]
-anchors_preset = 15
+[node name="Background" type="TextureRect" parent="."]
 z_index = -10
-color = Color(0.06, 0.06, 0.10, 1)
-size = Vector2(1280, 720)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+texture = ExtResource("bg_tex")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
 
 [node name="GoldenGlow" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -35,6 +43,12 @@ collision_mask = 2
 shape = SubResource("GroundShape")
 
 [node name="MonsoonModifier" parent="." instance=ExtResource("6_mm")]
+
+[node name="Slingshot" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(200, 615)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("ss_tex")
 
 [node name="PlayerHand" parent="." instance=ExtResource("2_ph")]
 position = Vector2(200, 570)
@@ -89,6 +103,9 @@ alignment = 1
 [node name="RetryLabel" type="Label" parent="RetryOverlay/RetryBox"]
 text = "So close! Try again?"
 horizontal_alignment = 1
+theme_override_colors/font_color = Color(1.0, 0.9, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 24
 
 [node name="RetryBtn" type="Button" parent="RetryOverlay/RetryBox"]

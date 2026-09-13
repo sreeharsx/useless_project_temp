@@ -12,6 +12,3 @@ func _ready() -> void:
 	for v in vallis:
 		if v.has_node("ValliStateController"):
 			v.get_node("ValliStateController").flee_speed = 280.0
-
-	if hud:
-		hud.show_popup("The Valli is ANGRY. RUN.", Color(1.0, 0.2, 0.2))

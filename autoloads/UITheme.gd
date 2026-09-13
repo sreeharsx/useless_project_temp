@@ -15,6 +15,8 @@ const C_BORDER     := Color(0.25, 0.88, 0.50, 1.0)   # Lime border
 const C_BORDER_HOV := Color(0.95, 0.85, 0.25, 1.0)   # Gold border on hover
 const C_BORDER_PRE := Color(1.00, 0.90, 0.35, 1.0)   # Bright gold pressed
 
+const FONT_MANJARI_BOLD: Font = preload("res://assets/fonts/Manjari/Manjari-Bold.ttf")
+
 var global_theme: Theme
 
 func _ready() -> void:
@@ -26,6 +28,22 @@ func _ready() -> void:
 
 func _build_theme() -> Theme:
 	var t := Theme.new()
+	t.default_font = FONT_MANJARI_BOLD
+	t.default_font_size = 18
+
+	# ── Label Styling (High Visibility Outline & Shadow) ──
+	t.set_font("font", "Label", FONT_MANJARI_BOLD)
+	t.set_color("font_color", "Label", Color(1.0, 1.0, 1.0, 1.0))
+	t.set_color("font_outline_color", "Label", Color(0.0, 0.0, 0.0, 0.95))
+	t.set_constant("outline_size", "Label", 5)
+	t.set_color("font_shadow_color", "Label", Color(0.0, 0.0, 0.0, 0.7))
+	t.set_constant("shadow_offset_x", "Label", 2)
+	t.set_constant("shadow_offset_y", "Label", 2)
+
+	# ── Button Styling ──
+	t.set_font("font", "Button", FONT_MANJARI_BOLD)
+	t.set_color("font_outline_color", "Button", Color(0.0, 0.0, 0.0, 0.9))
+	t.set_constant("outline_size", "Button", 3)
 
 	# ── Normal StyleBox ──
 	var sn := StyleBoxFlat.new()

@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://mainmenu"]
 
-[ext_resource type="Script" uid="uid://cfgbwqcl4krxd" path="res://scenes/main/MainMenu.gd" id="1_mm"]
+[ext_resource type="Script" path="res://scenes/main/MainMenu.gd" id="1_mm"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bg.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valli_idle.png" id="3_vi"]
 
 [node name="MainMenu" type="Control" unique_id=151283573]
 layout_mode = 3
@@ -11,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mm")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1989356765]
+[node name="Background" type="TextureRect" parent="." unique_id=1989356765]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,11 +21,24 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.06, 0.07, 0.12, 1)
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="BackgroundValli" type="Node2D" parent="." unique_id=870334213]
-modulate = Color(0.3, 0.85, 0.35, 0.15)
-position = Vector2(900, 400)
+[node name="DimOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.05, 0.08, 0.12, 0.6)
+
+[node name="BackgroundValli" type="Sprite2D" parent="." unique_id=870334213]
+position = Vector2(950, 400)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("3_vi")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1749240186]
 layout_mode = 1
@@ -44,13 +59,20 @@ alignment = 1
 [node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=729112358]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.25, 0.95, 0.45, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 56
 text = "വള്ളിപിടുത്തം"
 horizontal_alignment = 1
 
 [node name="SubtitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=2104620164]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.7)
+theme_override_colors/font_color = Color(1.0, 0.95, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 24
 text = "Valli Pidutham"
 horizontal_alignment = 1

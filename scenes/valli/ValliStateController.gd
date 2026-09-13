@@ -22,14 +22,22 @@ enum ValliState {
 
 # ─── Export configuration ─────────────────────────────────────────────────────
 @export var evasion_radius: float = 300.0          # Radius within which aim triggers OTTAM
-@export var flee_speed: float = 200.0
-@export var sine_amplitude: float = 60.0
-@export var sine_frequency: float = 3.0
-@export var pattikkal_dash_speed: float = 600.0
+@export var flee_speed: float = 160.0
+@export var sine_amplitude: float = 50.0
+@export var sine_frequency: float = 2.5
+@export var pattikkal_dash_speed: float = 450.0
 @export var pattikkal_dash_distance: float = 180.0
 @export var taunt_shake_amplitude: float = 8.0
 @export var taunt_shake_speed: float = 15.0
 @export var taunt_trigger_miss_count: int = 3
+
+# ─── Playable boundary (world coordinates, 1280×720 viewport) ─────────────────
+# Valli's sprite is ~88px at scale 0.07 (1254px * 0.07 ≈ 88). Half = 44.
+# Keep Valli fully visible and away from slingshot area.
+const PLAY_LEFT:   float = 380.0    # Right of slingshot area
+const PLAY_RIGHT:  float = 1220.0   # Left of right edge
+const PLAY_TOP:    float = 80.0     # Below HUD
+const PLAY_BOTTOM: float = 670.0    # Above ground (ground at y=718)
 
 # ─── Internal ─────────────────────────────────────────────────────────────────
 var current_state: ValliState = ValliState.IDLE
@@ -41,16 +49,24 @@ var _is_dashing: bool = false
 var _taunt_time: float = 0.0
 var _base_position: Vector2 = Vector2.ZERO
 var _last_player_launch_vel: Vector2 = Vector2.ZERO
+var _position_ready: bool = false   # True once spawn position is confirmed
 
 # ─── Lifecycle ─────────────────────────────────────────────────────────────────
 func _ready() -> void:
 	_owner_node = get_parent() as Node2D
-	_base_position = _owner_node.global_position
-
-	# Connect to PlayerHand signal via group
-	# PlayerHand broadcasts player_launched via group "slingshot"
-	# We connect dynamically when level starts
+	# Defer _base_position initialization so the level scene has fully applied
+	# the ValliTarget's spawn position before we read global_position.
+	call_deferred("_init_position")
 	call_deferred("_connect_signals")
+
+func _init_position() -> void:
+	_base_position = _owner_node.global_position
+	# Safety check: warn if Valli spawned outside play area
+	if not _is_in_bounds(_base_position):
+		push_warning("ValliStateController: spawn position %s is outside play area — clamping." % _base_position)
+		_base_position = _clamp_to_bounds(_base_position)
+		_owner_node.global_position = _base_position
+	_position_ready = true
 
 func _connect_signals() -> void:
 	# Find PlayerHand in scene and connect its signal
@@ -92,6 +108,9 @@ func trigger_idle() -> void:
 
 # ─── Physics Update ───────────────────────────────────────────────────────────
 func process_movement(delta: float) -> void:
+	# Do not move until spawn position has been confirmed via _init_position
+	if not _position_ready:
+		return
 	match current_state:
 		ValliState.IDLE:
 			_process_idle(delta)
@@ -103,7 +122,7 @@ func process_movement(delta: float) -> void:
 			_process_taunt(delta)
 
 func _process_idle(_delta: float) -> void:
-	# Subtle vertical wiggle
+	# Subtle vertical wiggle driven by code (not animation) to preserve spawn position
 	var wiggle := sin(Time.get_ticks_msec() * 0.003) * 3.0
 	_owner_node.global_position = _base_position + Vector2(0, wiggle)
 
@@ -113,26 +132,36 @@ func _process_ottam(delta: float) -> void:
 	var perp := _flee_direction.rotated(PI * 0.5)
 	var lateral := sin(_flee_time * sine_frequency) * sine_amplitude
 	var move := (_flee_direction * flee_speed + perp * lateral) * delta
-	_owner_node.global_position += move
-	_base_position = _owner_node.global_position  # update base so idle doesn't snap back
+	var new_pos := _owner_node.global_position + move
+	# Clamp so Valli never leaves the play area
+	new_pos = _clamp_to_bounds(new_pos)
+	_owner_node.global_position = new_pos
+	_base_position = new_pos  # update base so idle doesn't snap back
+	# If Valli hits a boundary while fleeing, reverse the flee direction on that axis
+	if new_pos.x <= PLAY_LEFT or new_pos.x >= PLAY_RIGHT:
+		_flee_direction.x = -_flee_direction.x
+	if new_pos.y <= PLAY_TOP or new_pos.y >= PLAY_BOTTOM:
+		_flee_direction.y = -_flee_direction.y
 
 func _process_pattikkal(delta: float) -> void:
 	if not _is_dashing:
 		return
 	var dist := _owner_node.global_position.distance_to(_pattikkal_target)
 	if dist < 5.0:
-		_owner_node.global_position = _pattikkal_target
-		_base_position = _pattikkal_target
+		var final_pos := _clamp_to_bounds(_pattikkal_target)
+		_owner_node.global_position = final_pos
+		_base_position = final_pos
 		_is_dashing = false
 		_change_state(ValliState.IDLE)
 	else:
 		var dir := (_pattikkal_target - _owner_node.global_position).normalized()
-		_owner_node.global_position += dir * pattikkal_dash_speed * delta
+		var new_pos := _owner_node.global_position + dir * pattikkal_dash_speed * delta
+		_owner_node.global_position = _clamp_to_bounds(new_pos)
 
 func _process_taunt(delta: float) -> void:
 	_taunt_time += delta
 	var shake := sin(_taunt_time * taunt_shake_speed) * taunt_shake_amplitude
-	_owner_node.global_position = _base_position + Vector2(shake, 0)
+	_owner_node.global_position = _clamp_to_bounds(_base_position + Vector2(shake, 0))
 
 # ─── State Transitions ────────────────────────────────────────────────────────
 func _change_state(new_state: ValliState) -> void:
@@ -150,6 +179,7 @@ func _on_state_enter(state: ValliState) -> void:
 			_flee_time = 0.0
 		ValliState.OTTAM:
 			_flee_time = 0.0
+			DialogueManager.play_disappear()
 		ValliState.PATTIKKAL:
 			_execute_pattikkal()
 		ValliState.TAUNT:
@@ -164,11 +194,12 @@ func _on_state_exit(state: ValliState) -> void:
 
 # ─── Pattikkal (Fake-out) ─────────────────────────────────────────────────────
 func _execute_pattikkal() -> void:
-	# Dash diagonally to a random nearby anchor
+	# Dash diagonally to a random nearby anchor — clamped to play area
 	var angle := randf_range(0.0, TAU)
-	_pattikkal_target = _base_position + Vector2(cos(angle), sin(angle)) * pattikkal_dash_distance
+	var raw_target := _base_position + Vector2(cos(angle), sin(angle)) * pattikkal_dash_distance
+	_pattikkal_target = _clamp_to_bounds(raw_target)
 	_is_dashing = true
-	DialogueManager.play_dialogue("TRICKED")
+	DialogueManager.play_disappear()
 	pattikkal_executed.emit(_pattikkal_target)
 
 func _on_player_launched(velocity: Vector2) -> void:
@@ -197,3 +228,14 @@ func _predict_landing(start: Vector2, vel: Vector2, gravity: float) -> Vector2:
 		t = (-b - sqrt(disc)) / (2 * a)
 	t = max(t, 0.0)
 	return start + Vector2(vel.x * t, vel.y * t + 0.5 * gravity * t * t)
+
+# ─── Boundary Helpers ─────────────────────────────────────────────────────────
+func _clamp_to_bounds(pos: Vector2) -> Vector2:
+	return Vector2(
+		clampf(pos.x, PLAY_LEFT, PLAY_RIGHT),
+		clampf(pos.y, PLAY_TOP, PLAY_BOTTOM)
+	)
+
+func _is_in_bounds(pos: Vector2) -> bool:
+	return pos.x >= PLAY_LEFT and pos.x <= PLAY_RIGHT \
+		and pos.y >= PLAY_TOP and pos.y <= PLAY_BOTTOM

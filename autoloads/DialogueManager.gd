@@ -1,10 +1,6 @@
 ## DialogueManager.gd
-## Autoloaded singleton managing all comedic audio triggers, dialogue bus ducking,
-## and Malayalam voice/sound clip playback with overlap protection.
-##
-## Audio files should be placed in res://assets/audio/dialogue/
-## Expected files: miss_01..03.ogg, bus_hit_01..02.ogg, tricked_01..03.ogg,
-##                 high_deaths_01.ogg, victory_01.ogg
+## Autoloaded singleton managing all comedic audio triggers, sound effects,
+## drag audio, fall audio, disappear effects, and miss dialogue progression.
 
 extends Node
 
@@ -14,131 +10,166 @@ signal dialogue_finished(event_type: String)
 
 # ─── Constants ─────────────────────────────────────────────────────────────────
 const DIALOGUE_BUS: String = "Dialogue"
-const MUSIC_BUS: String = "Music"
-const DUCK_VOLUME_DB: float = -12.0
-const RESTORE_TWEEN_DURATION: float = 0.4
-
-# Audio event → array of resource paths (fallback: empty plays silence gracefully)
-const AUDIO_MAP: Dictionary = {
-	"MISS": [
-		"res://assets/audio/dialogue/miss_01.ogg",
-		"res://assets/audio/dialogue/miss_02.ogg",
-		"res://assets/audio/dialogue/miss_03.ogg",
-	],
-	"BUS_HIT": [
-		"res://assets/audio/dialogue/bus_hit_01.ogg",
-		"res://assets/audio/dialogue/bus_hit_02.ogg",
-	],
-	"TRICKED": [
-		"res://assets/audio/dialogue/tricked_01.ogg",
-		"res://assets/audio/dialogue/tricked_02.ogg",
-		"res://assets/audio/dialogue/tricked_03.ogg",
-	],
-	"HIGH_DEATHS": [
-		"res://assets/audio/dialogue/high_deaths_01.ogg",
-	],
-	"VICTORY": [
-		"res://assets/audio/dialogue/victory_01.ogg",
-	],
-}
-
-# Fallback subtitle text when no audio file exists (shown as popup instead)
-const SUBTITLE_MAP: Dictionary = {
-	"MISS": ["Aiyyo!", "Missed again!", "Avide alla!", "Ithenthu paattiyaa?"],
-	"BUS_HIT": ["KSRTC-yle kayiri!", "Oyyyyy BUS!"],
-	"TRICKED": ["Ettaaaa! Valli odi!", "Ha! Caught nothing!", "Ayyy trickster vine!"],
-	"HIGH_DEATHS": ["Ini nee padam kaanuka...", "Ithu game alle, ithu life aanu!"],
-	"VICTORY": ["OTTHO! Pidichi!", "Valli caught! Ningal jejichu!"],
-}
+const SFX_BUS: String = "SFX"
+const AUDIO_DIR: String = "res://assets/audio/dialogue/"
 
 # ─── Nodes ─────────────────────────────────────────────────────────────────────
-var _player: AudioStreamPlayer
-var _music_restore_tween: Tween
+var _dialogue_player: AudioStreamPlayer
+var _sfx_player: AudioStreamPlayer
+var _drag_player: AudioStreamPlayer
+var _stream_cache: Dictionary = {}
 var _current_event: String = ""
 
 # ─── Lifecycle ─────────────────────────────────────────────────────────────────
 func _ready() -> void:
-	_player = AudioStreamPlayer.new()
-	_player.bus = DIALOGUE_BUS
-	add_child(_player)
-	_player.finished.connect(_on_dialogue_finished)
 	_ensure_audio_buses()
 
+	_dialogue_player = AudioStreamPlayer.new()
+	_dialogue_player.bus = DIALOGUE_BUS
+	add_child(_dialogue_player)
+	_dialogue_player.finished.connect(_on_dialogue_finished)
+
+	_sfx_player = AudioStreamPlayer.new()
+	_sfx_player.bus = SFX_BUS
+	add_child(_sfx_player)
+
+	_drag_player = AudioStreamPlayer.new()
+	_drag_player.bus = SFX_BUS
+	add_child(_drag_player)
+
 func _ensure_audio_buses() -> void:
-	# Ensure Dialogue bus exists (runtime creation for robustness)
 	if AudioServer.get_bus_index(DIALOGUE_BUS) == -1:
 		AudioServer.add_bus()
 		var idx := AudioServer.get_bus_count() - 1
 		AudioServer.set_bus_name(idx, DIALOGUE_BUS)
-	if AudioServer.get_bus_index(MUSIC_BUS) == -1:
+	if AudioServer.get_bus_index(SFX_BUS) == -1:
 		AudioServer.add_bus()
 		var idx := AudioServer.get_bus_count() - 1
-		AudioServer.set_bus_name(idx, MUSIC_BUS)
+		AudioServer.set_bus_name(idx, SFX_BUS)
 
-# ─── Public API ────────────────────────────────────────────────────────────────
-func play_dialogue(event_type: String) -> String:
-	"""
-	Play a random audio clip for the given event type.
-	Stops any currently playing dialogue first (overlap protection).
-	Returns the subtitle string that was selected.
-	"""
-	# Overlap protection
-	if _player.playing:
-		_player.stop()
+# ─── Audio Stream Loader ───────────────────────────────────────────────────────
+func get_sound_stream(sound_name: String) -> AudioStream:
+	if _stream_cache.has(sound_name):
+		return _stream_cache[sound_name]
+
+	var candidates: Array[String] = [
+		AUDIO_DIR + sound_name + ".mp3",
+		AUDIO_DIR + sound_name + ".mpeg",
+		AUDIO_DIR + sound_name + ".ogg",
+		AUDIO_DIR + sound_name + ".wav",
+	]
+
+	for path in candidates:
+		if ResourceLoader.exists(path):
+			var res = load(path)
+			if res is AudioStream:
+				_stream_cache[sound_name] = res
+				return res
+
+		if FileAccess.file_exists(path):
+			var bytes := FileAccess.get_file_as_bytes(path)
+			if bytes.size() > 0:
+				var mp3 := AudioStreamMP3.new()
+				mp3.data = bytes
+				_stream_cache[sound_name] = mp3
+				return mp3
+
+	return null
+
+var _drag_index: int = 0
+
+# ─── Drag Sound (Alternating drag and drag01) ─────────────────────────────────
+func play_drag() -> void:
+	var sound_name := "drag" if (_drag_index % 2 == 0) else "drag01"
+	var stream := get_sound_stream(sound_name)
+	if stream:
+		if stream is AudioStreamMP3:
+			(stream as AudioStreamMP3).loop = true
+		_drag_player.stream = stream
+		if not _drag_player.playing:
+			_drag_player.play()
+
+func advance_drag_index() -> void:
+	_drag_index += 1
+
+func stop_drag() -> void:
+	if _drag_player.playing:
+		_drag_player.stop()
+
+func stop_all_dialogue() -> void:
+	if _dialogue_player.playing:
+		_dialogue_player.stop()
+
+# ─── Sound Effects (Fall & Disappear) ─────────────────────────────────────────
+func play_fall() -> void:
+	var stream := get_sound_stream("fall")
+	if stream:
+		_sfx_player.stream = stream
+		_sfx_player.play()
+
+func play_disappear() -> void:
+	var stream := get_sound_stream("disappear")
+	if stream:
+		_sfx_player.stream = stream
+		_sfx_player.play()
+
+# ─── Miss Dialogue Progression ─────────────────────────────────────────────────
+# 1st miss: miss_01 or miss_02
+# 2-3 misses: miss_03
+# More misses (4+): miss_05
+func play_miss(miss_count: int) -> void:
+	var sound_name: String = ""
+	if miss_count <= 1:
+		sound_name = "miss_01" if randf() < 0.5 else "miss_02"
+	elif miss_count == 2 or miss_count == 3:
+		sound_name = "miss_03"
+	else:
+		sound_name = "miss_05"
+
+	_play_dialogue_sound(sound_name, "MISS")
+
+func play_victory() -> void:
+	_play_dialogue_sound("victory", "VICTORY")
+
+func play_bus_hit() -> void:
+	var sound_name := "bus_hit_01" if randf() < 0.5 else "bus_hit_02"
+	_play_dialogue_sound(sound_name, "BUS_HIT")
+
+func _play_dialogue_sound(sound_name: String, event_type: String) -> void:
+	if _dialogue_player.playing:
+		_dialogue_player.stop()
 
 	_current_event = event_type
-	var subtitle := _pick_subtitle(event_type)
-
-	var audio_paths: Array = AUDIO_MAP.get(event_type, [])
-	if audio_paths.size() > 0:
-		var path: String = audio_paths[randi() % audio_paths.size()]
-		if ResourceLoader.exists(path):
-			var stream := load(path) as AudioStream
-			if stream:
-				_player.stream = stream
-				_duck_music()
-				_player.play()
-				dialogue_started.emit(event_type)
-				return subtitle
-
-	# No audio available — emit finished immediately so UI can still show popup
-	dialogue_finished.emit(event_type)
-	return subtitle
-
-func get_random_subtitle(event_type: String) -> String:
-	return _pick_subtitle(event_type)
-
-func is_playing() -> bool:
-	return _player.playing
-
-func stop() -> void:
-	if _player.playing:
-		_player.stop()
-
-# ─── Internals ─────────────────────────────────────────────────────────────────
-func _pick_subtitle(event_type: String) -> String:
-	var subs: Array = SUBTITLE_MAP.get(event_type, ["..."])
-	return subs[randi() % subs.size()]
-
-func _duck_music() -> void:
-	var music_idx := AudioServer.get_bus_index(MUSIC_BUS)
-	if music_idx == -1:
-		return
-	if _music_restore_tween and _music_restore_tween.is_valid():
-		_music_restore_tween.kill()
-	AudioServer.set_bus_volume_db(music_idx, DUCK_VOLUME_DB)
-
-func _restore_music() -> void:
-	var music_idx := AudioServer.get_bus_index(MUSIC_BUS)
-	if music_idx == -1:
-		return
-	_music_restore_tween = create_tween()
-	_music_restore_tween.tween_method(
-		func(vol: float): AudioServer.set_bus_volume_db(music_idx, vol),
-		DUCK_VOLUME_DB, 0.0, RESTORE_TWEEN_DURATION
-	)
+	var stream := get_sound_stream(sound_name)
+	if stream:
+		_dialogue_player.stream = stream
+		_dialogue_player.play()
+		dialogue_started.emit(event_type)
+	else:
+		dialogue_finished.emit(event_type)
 
 func _on_dialogue_finished() -> void:
-	_restore_music()
 	dialogue_finished.emit(_current_event)
 	_current_event = ""
+
+# ─── Legacy/Compatibility API ─────────────────────────────────────────────────
+func play_dialogue(event_type: String) -> String:
+	match event_type:
+		"MISS":
+			play_miss(GameState.level_pani_kitti)
+		"BUS_HIT":
+			play_bus_hit()
+		"VICTORY":
+			play_victory()
+		"DISAPPEAR":
+			play_disappear()
+		_:
+			pass
+	return ""
+
+func is_playing() -> bool:
+	return _dialogue_player.playing
+
+func stop() -> void:
+	if _dialogue_player.playing:
+		_dialogue_player.stop()

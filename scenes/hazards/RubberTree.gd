@@ -19,6 +19,7 @@ extends StaticBody2D
 
 # ─── Lifecycle ─────────────────────────────────────────────────────────────────
 func _ready() -> void:
+	add_to_group("rubber_trees")
 	# Apply physics material with high bounce
 	var mat := PhysicsMaterial.new()
 	mat.bounce = bounce_value

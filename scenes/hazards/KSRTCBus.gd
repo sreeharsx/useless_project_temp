@@ -64,9 +64,13 @@ func _on_hazard_area_body_entered(body: Node) -> void:
 	if body.is_in_group("slingshot"):
 		bus_collision.emit(body.global_position)
 		DialogueManager.play_dialogue("BUS_HIT")
-		GameState.register_miss()
-		LevelManager.notify_level_failed()
 		_play_horn()
+		if body.has_method("handle_bus_hit"):
+			body.call_deferred("handle_bus_hit")
+		elif body.has_method("_handle_fall"):
+			body.call_deferred("_handle_fall")
+		elif body.has_method("_trigger_reset"):
+			body.call_deferred("_trigger_reset")
 
 # ─── VFX ──────────────────────────────────────────────────────────────────────
 func _play_horn() -> void:

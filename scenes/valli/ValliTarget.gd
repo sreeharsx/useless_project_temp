@@ -25,6 +25,13 @@ signal valli_caught(position: Vector2)
 @onready var dust_particles: CPUParticles2D = $DustParticles
 @onready var sprite: Sprite2D = $Sprite2D
 
+# ─── Sprite Textures ──────────────────────────────────────────────────────────
+const TEX_IDLE: Texture2D = preload("res://assets/sprites/valli_idle.png")
+const TEX_FLEE: Texture2D = preload("res://assets/sprites/valli_flee.png")
+const TEX_TAUNT: Texture2D = preload("res://assets/sprites/valli_taunt.png")
+const TEX_GOLDEN: Texture2D = preload("res://assets/sprites/valli_golden.png")
+const TEX_CATCHED: Texture2D = preload("res://assets/sprites/catched.png")
+
 # ─── Lifecycle ─────────────────────────────────────────────────────────────────
 func _ready() -> void:
 	add_to_group("valli_targets")
@@ -38,6 +45,8 @@ func _ready() -> void:
 	# Monitor consecutive misses for taunt trigger
 	GameState.pani_kitti_updated.connect(_on_pani_kitti_updated)
 
+	sprite.scale = Vector2(0.07, 0.07)
+	sprite.modulate = Color.WHITE
 	_set_visual_for_state(ValliStateController.ValliState.IDLE)
 
 	if is_golden:
@@ -88,7 +97,24 @@ func _handle_caught(projectile: Node) -> void:
 		projectile.register_valli_caught()
 
 	GameState.register_catch()
+
+	# Stop any playing animation first
+	if anim_player.is_playing():
+		anim_player.stop()
+
+	# Change texture to caught state
+	sprite.texture = TEX_CATCHED
+	sprite.modulate = Color.WHITE
+	sprite.scale = Vector2(0.07, 0.07)
+	sprite.rotation = 0.0
+
+	# Play catch celebration: scale pop + sparkle
 	dust_particles.emitting = true
+	var catch_tween := create_tween()
+	catch_tween.tween_property(self, "scale", Vector2(1.4, 1.4), 0.15).set_trans(Tween.TRANS_BACK)
+	catch_tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.15).set_trans(Tween.TRANS_BOUNCE)
+	catch_tween.tween_interval(0.4)
+	catch_tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.35)
 
 	valli_caught.emit(global_position)
 
@@ -96,10 +122,13 @@ func _handle_caught(projectile: Node) -> void:
 	DialogueManager.play_dialogue("VICTORY")
 
 	# Notify level manager
-	LevelManager.notify_level_complete()
+	if is_golden or GameState.current_level >= GameState.MAX_LEVELS:
+		LevelManager.notify_game_complete()
+	else:
+		LevelManager.notify_level_complete()
 
 	# Hide after brief delay
-	var t := get_tree().create_timer(0.8)
+	var t := get_tree().create_timer(1.2)
 	t.timeout.connect(func(): queue_free())
 
 # ─── State Visual Reactions ───────────────────────────────────────────────────
@@ -107,21 +136,24 @@ func _on_state_changed(_old_state: int, new_state: int) -> void:
 	_set_visual_for_state(new_state as ValliStateController.ValliState)
 
 func _set_visual_for_state(state: ValliStateController.ValliState) -> void:
+	if anim_player.is_playing():
+		anim_player.stop()
+	sprite.rotation = 0.0
+	sprite.scale = Vector2(0.07, 0.07)
+
 	match state:
 		ValliStateController.ValliState.IDLE:
-			if anim_player.has_animation("wiggle"):
-				anim_player.play("wiggle")
+			sprite.texture = TEX_GOLDEN if is_golden else TEX_IDLE
 			modulate = Color.WHITE if not is_golden else Color(1.0, 0.9, 0.3)
 		ValliStateController.ValliState.OTTAM:
-			if anim_player.has_animation("flee"):
-				anim_player.play("flee")
-			modulate = Color(1.0, 0.6, 0.2)  # Orange tint — alarmed
+			sprite.texture = TEX_FLEE
+			modulate = Color.WHITE
 		ValliStateController.ValliState.PATTIKKAL:
-			modulate = Color(0.5, 0.5, 0.5)  # Grey — frozen
+			sprite.texture = TEX_FLEE
+			modulate = Color.WHITE
 		ValliStateController.ValliState.TAUNT:
-			if anim_player.has_animation("taunt"):
-				anim_player.play("taunt")
-			modulate = Color(1.0, 0.3, 0.3)  # Red — taunting
+			sprite.texture = TEX_TAUNT
+			modulate = Color.WHITE
 
 func _on_pattikkal(_dash_to: Vector2) -> void:
 	dust_particles.global_position = global_position
@@ -131,12 +163,11 @@ func _on_taunt_started() -> void:
 	# Play a taunt sound / dialogue
 	pass
 
-func _on_pani_kitti_updated(count: int) -> void:
-	# Trigger taunt after 3 consecutive misses in this level
+func _on_pani_kitti_updated(_count: int) -> void:
+	# Trigger taunt after consecutive misses in this level
 	if GameState.consecutive_misses >= state_controller.taunt_trigger_miss_count:
 		if state_controller.current_state != ValliStateController.ValliState.TAUNT:
 			state_controller.trigger_taunt()
-			DialogueManager.play_dialogue("HIGH_DEATHS" if count > 10 else "TRICKED")
 			# Auto-exit taunt after 3 seconds
 			var t := get_tree().create_timer(3.0)
 			t.timeout.connect(func(): state_controller.trigger_idle())

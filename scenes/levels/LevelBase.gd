@@ -29,18 +29,13 @@ func _wire_level_manager() -> void:
 
 # ─── Event Handlers ───────────────────────────────────────────────────────────
 func _on_projectile_reset() -> void:
-	GameState.register_miss()
-	DialogueManager.play_dialogue("MISS")
+	pass
 
 func _on_level_failed(_level_num: int) -> void:
-	# Show retry overlay after short delay
-	var t := get_tree().create_timer(1.0)
-	t.timeout.connect(_show_retry_overlay)
+	pass
 
 func _on_level_complete(_level_num: int) -> void:
-	# Handled by LevelManager — optionally show "Level Clear!" popup
-	if hud and hud.has_method("show_popup"):
-		hud.show_popup("Level Clear! 🎉", Color(0.2, 1.0, 0.5))
+	pass
 
 func _show_retry_overlay() -> void:
 	retry_overlay.visible = true

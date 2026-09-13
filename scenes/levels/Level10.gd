@@ -4,6 +4,7 @@
 extends "res://scenes/levels/LevelBase.gd"
 
 func _ready() -> void:
+	GameState.current_level = 10
 	super._ready()
 	# Enable golden effect on Valli
 	var vallis := get_tree().get_nodes_in_group("valli_targets")
@@ -12,10 +13,6 @@ func _ready() -> void:
 		if v.has_method("_apply_golden_effect"):
 			v._apply_golden_effect()
 
-	if hud:
-		hud.show_popup("✨ The Golden Valli. End this.", Color(1.0, 0.9, 0.2))
-
 func _on_level_complete(_level_num: int) -> void:
-	# Override — go directly to meta ending
-	# (LevelManager handles this for level 10 automatically)
-	pass
+	LevelManager.notify_game_complete()
+

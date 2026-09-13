@@ -74,12 +74,23 @@ func go_to_main_menu() -> void:
 
 func notify_level_complete() -> void:
 	level_complete.emit(GameState.current_level)
-	if GameState.current_level == GameState.MAX_LEVELS:
-		_trigger_game_complete()
+	if GameState.current_level >= GameState.MAX_LEVELS:
+		notify_game_complete()
 	else:
 		# Small delay then advance
 		var t := get_tree().create_timer(1.5)
 		t.timeout.connect(advance_to_next_level)
+
+func notify_game_complete() -> void:
+	if _is_transitioning:
+		return
+	_is_transitioning = true
+	game_complete.emit()
+	# Delay 1.2s to let the catch animation and celebration finish
+	var t := get_tree().create_timer(1.2)
+	t.timeout.connect(func():
+		_fade_and_change_scene(META_ENDING_SCENE)
+	)
 
 func notify_level_failed() -> void:
 	GameState.register_miss()
@@ -93,8 +104,7 @@ func _get_level_path(level_num: int) -> String:
 	return LEVEL_SCENE_PATHS[level_num]
 
 func _trigger_game_complete() -> void:
-	game_complete.emit()
-	_fade_and_change_scene(META_ENDING_SCENE)
+	notify_game_complete()
 
 func _transition_to_scene(path: String, level_num: int = -1) -> void:
 	get_tree().change_scene_to_file(path)

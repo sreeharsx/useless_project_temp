@@ -1,9 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://level01"]
+[gd_scene load_steps=9 format=3 uid="uid://level01"]
 
 [ext_resource type="Script" path="res://scenes/levels/Level01.gd" id="1_l1"]
 [ext_resource type="PackedScene" path="res://scenes/player/PlayerHand.tscn" id="2_ph"]
 [ext_resource type="PackedScene" path="res://scenes/valli/ValliTarget.tscn" id="3_vt"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bg.png" id="5_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/slingshot.png" id="6_ss"]
 
 [sub_resource type="RectangleShape2D" id="GroundShape"]
 size = Vector2(1280, 24)
@@ -14,25 +16,17 @@ size = Vector2(1280, 24)
 [node name="Level01" type="Node2D"]
 script = ExtResource("1_l1")
 
-[node name="Background" type="ColorRect" parent="."]
-anchors_preset = 15
+[node name="Background" type="TextureRect" parent="."]
 z_index = -10
-color = Color(0.40, 0.70, 0.95, 1)
-size = Vector2(1280, 720)
-
-[node name="GroundStrip" type="ColorRect" parent="."]
-z_index = -9
-color = Color(0.22, 0.55, 0.22, 1)
-position = Vector2(0, 560)
-size = Vector2(1280, 160)
-
-[node name="LevelLabel" type="Label" parent="."]
-z_index = 5
-position = Vector2(16, 8)
-theme_override_colors/font_color = Color(1, 1, 1, 0.8)
-theme_override_font_sizes/font_size = 14
-text = "Level 1 — Valli's Backyard"
-
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+texture = ExtResource("5_bg")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
 
 [node name="Ground" type="StaticBody2D" parent="."]
 position = Vector2(640, 718)
@@ -42,23 +36,11 @@ collision_mask = 2
 [node name="GroundCollision" type="CollisionShape2D" parent="Ground"]
 shape = SubResource("GroundShape")
 
-[node name="SlingshotStand" type="ColorRect" parent="."]
+[node name="Slingshot" type="Sprite2D" parent="."]
 z_index = -1
-position = Vector2(194, 570)
-size = Vector2(12, 148)
-color = Color(0.42, 0.26, 0.12, 1)
-
-[node name="SlingshotForkLeft" type="ColorRect" parent="."]
-z_index = -1
-position = Vector2(182, 545)
-size = Vector2(12, 35)
-color = Color(0.42, 0.26, 0.12, 1)
-
-[node name="SlingshotForkRight" type="ColorRect" parent="."]
-z_index = -1
-position = Vector2(206, 545)
-size = Vector2(12, 35)
-color = Color(0.42, 0.26, 0.12, 1)
+position = Vector2(200, 615)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_ss")
 
 [node name="PlayerHand" parent="." instance=ExtResource("2_ph")]
 position = Vector2(200, 560)
