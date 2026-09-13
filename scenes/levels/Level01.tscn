@@ -1,0 +1,108 @@
+[gd_scene load_steps=7 format=3 uid="uid://level01"]
+
+[ext_resource type="Script" path="res://scenes/levels/Level01.gd" id="1_l1"]
+[ext_resource type="PackedScene" path="res://scenes/player/PlayerHand.tscn" id="2_ph"]
+[ext_resource type="PackedScene" path="res://scenes/valli/ValliTarget.tscn" id="3_vt"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
+
+[sub_resource type="RectangleShape2D" id="GroundShape"]
+size = Vector2(1280, 24)
+
+[sub_resource type="WorldBoundaryShape2D" id="WallLeft"]
+[sub_resource type="WorldBoundaryShape2D" id="WallRight"]
+
+[node name="Level01" type="Node2D"]
+script = ExtResource("1_l1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+z_index = -10
+color = Color(0.40, 0.70, 0.95, 1)
+size = Vector2(1280, 720)
+
+[node name="GroundStrip" type="ColorRect" parent="."]
+z_index = -9
+color = Color(0.22, 0.55, 0.22, 1)
+position = Vector2(0, 560)
+size = Vector2(1280, 160)
+
+[node name="LevelLabel" type="Label" parent="."]
+z_index = 5
+position = Vector2(16, 8)
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "Level 1 — Valli's Backyard"
+
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(640, 718)
+collision_layer = 1
+collision_mask = 2
+
+[node name="GroundCollision" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("GroundShape")
+
+[node name="SlingshotStand" type="ColorRect" parent="."]
+z_index = -1
+position = Vector2(194, 570)
+size = Vector2(12, 148)
+color = Color(0.42, 0.26, 0.12, 1)
+
+[node name="SlingshotForkLeft" type="ColorRect" parent="."]
+z_index = -1
+position = Vector2(182, 545)
+size = Vector2(12, 35)
+color = Color(0.42, 0.26, 0.12, 1)
+
+[node name="SlingshotForkRight" type="ColorRect" parent="."]
+z_index = -1
+position = Vector2(206, 545)
+size = Vector2(12, 35)
+color = Color(0.42, 0.26, 0.12, 1)
+
+[node name="PlayerHand" parent="." instance=ExtResource("2_ph")]
+position = Vector2(200, 560)
+
+[node name="ValliTarget" parent="." instance=ExtResource("3_vt")]
+position = Vector2(900, 400)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="RetryOverlay" type="CanvasLayer" parent="."]
+visible = false
+layer = 20
+
+[node name="RetryBG" type="ColorRect" parent="RetryOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="RetryBox" type="VBoxContainer" parent="RetryOverlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -80.0
+offset_right = 150.0
+offset_bottom = 80.0
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="RetryLabel" type="Label" parent="RetryOverlay/RetryBox"]
+text = "Aiyyo! Try again?"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+
+[node name="RetryBtn" type="Button" parent="RetryOverlay/RetryBox"]
+text = "Retry"
+custom_minimum_size = Vector2(0, 44)
+
+[node name="MenuBtn" type="Button" parent="RetryOverlay/RetryBox"]
+text = "Main Menu"
+custom_minimum_size = Vector2(0, 44)
+
+[connection signal="pressed" from="RetryOverlay/RetryBox/RetryBtn" to="." method="_on_retry_pressed"]
+[connection signal="pressed" from="RetryOverlay/RetryBox/MenuBtn" to="." method="_on_menu_pressed"]

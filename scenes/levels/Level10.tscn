@@ -1,0 +1,103 @@
+[gd_scene load_steps=8 format=3 uid="uid://level10"]
+
+[ext_resource type="Script" path="res://scenes/levels/Level10.gd" id="1_l10"]
+[ext_resource type="PackedScene" path="res://scenes/player/PlayerHand.tscn" id="2_ph"]
+[ext_resource type="PackedScene" path="res://scenes/valli/ValliTarget.tscn" id="3_vt"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/RubberTree.tscn" id="4_rt"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/KSRTCBus.tscn" id="5_bus"]
+[ext_resource type="PackedScene" path="res://scenes/environment/MonsoonModifier.tscn" id="6_mm"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="7_hud"]
+
+[sub_resource type="RectangleShape2D" id="GroundShape"]
+size = Vector2(1280, 24)
+
+[node name="Level10" type="Node2D"]
+script = ExtResource("1_l10")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+z_index = -10
+color = Color(0.06, 0.06, 0.10, 1)
+size = Vector2(1280, 720)
+
+[node name="GoldenGlow" type="ColorRect" parent="."]
+anchors_preset = 15
+z_index = -9
+color = Color(1.0, 0.85, 0.1, 0.04)
+size = Vector2(1280, 720)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(640, 718)
+collision_layer = 1
+collision_mask = 2
+
+[node name="GroundCollision" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("GroundShape")
+
+[node name="MonsoonModifier" parent="." instance=ExtResource("6_mm")]
+
+[node name="PlayerHand" parent="." instance=ExtResource("2_ph")]
+position = Vector2(200, 570)
+
+[node name="RubberTree1" parent="." instance=ExtResource("4_rt")]
+position = Vector2(480, 620)
+
+[node name="RubberTree2" parent="." instance=ExtResource("4_rt")]
+position = Vector2(670, 600)
+
+[node name="RubberTree3" parent="." instance=ExtResource("4_rt")]
+position = Vector2(840, 640)
+
+[node name="KSRTCBus1" parent="." instance=ExtResource("5_bus")]
+position = Vector2(-200, 380)
+travel_speed = 340.0
+travel_direction = 1.0
+
+[node name="KSRTCBus2" parent="." instance=ExtResource("5_bus")]
+position = Vector2(1480, 480)
+travel_speed = 300.0
+travel_direction = -1.0
+
+[node name="GoldenValli" parent="." instance=ExtResource("3_vt")]
+position = Vector2(980, 200)
+is_golden = true
+
+[node name="HUD" parent="." instance=ExtResource("7_hud")]
+
+[node name="RetryOverlay" type="CanvasLayer" parent="."]
+visible = false
+layer = 20
+
+[node name="RetryBG" type="ColorRect" parent="RetryOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="RetryBox" type="VBoxContainer" parent="RetryOverlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -80.0
+offset_right = 150.0
+offset_bottom = 80.0
+alignment = 1
+
+[node name="RetryLabel" type="Label" parent="RetryOverlay/RetryBox"]
+text = "So close! Try again?"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+
+[node name="RetryBtn" type="Button" parent="RetryOverlay/RetryBox"]
+text = "One More Try"
+custom_minimum_size = Vector2(0, 44)
+
+[node name="MenuBtn" type="Button" parent="RetryOverlay/RetryBox"]
+text = "Give Up (Main Menu)"
+custom_minimum_size = Vector2(0, 44)
+
+[connection signal="pressed" from="RetryOverlay/RetryBox/RetryBtn" to="." method="_on_retry_pressed"]
+[connection signal="pressed" from="RetryOverlay/RetryBox/MenuBtn" to="." method="_on_menu_pressed"]

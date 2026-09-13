@@ -1,0 +1,9 @@
+## Sprite asset placeholder.
+## Required sprites (create in Aseprite or use CC0 assets):
+##   - hand_projectile.png  (32×32) — the thrown projectile
+##   - valli_idle.png       (64×64) — vine face, green with cartoon eyes
+##   - valli_flee.png       (64×64) — vine with alarmed expression
+##   - rubber_tree.png      (80×160) — tall tree trunk + green canopy
+##   - ksrtc_bus.png        (180×70) — red/orange KSRTC-style bus side view
+##   - slingshot.png        (60×80) — Y-fork slingshot post
+##   - background_*.png     — per-level background tiles

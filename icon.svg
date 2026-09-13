@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="16" fill="#1a1a2e"/>
+  <ellipse cx="64" cy="50" rx="28" ry="20" fill="#2ecc71" opacity="0.9"/>
+  <path d="M36 50 Q64 20 92 50 Q64 35 36 50" fill="#27ae60"/>
+  <!-- Vine tendrils -->
+  <path d="M64 50 Q55 65 48 80" stroke="#2ecc71" stroke-width="3" fill="none"/>
+  <path d="M64 50 Q73 65 80 80" stroke="#2ecc71" stroke-width="3" fill="none"/>
+  <path d="M64 50 Q64 70 64 90" stroke="#27ae60" stroke-width="2" fill="none"/>
+  <!-- Slingshot fork -->
+  <path d="M20 100 L30 70 M30 70 L38 85 M30 70 L22 85" stroke="#8B4513" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- Malayalam text hint -->
+  <text x="64" y="118" text-anchor="middle" font-size="8" fill="#f39c12" font-family="serif">വള്ളിപിടുത്തം</text>
+</svg>
