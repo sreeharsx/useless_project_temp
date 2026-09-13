@@ -37,8 +37,29 @@ We built a game literally based on the Malayalam idiom **"വള്ളിപി�
 ---
 
 ### Implementation
+For Software:
 
-#### Installation
+# Installation
+
+#### 📦 Option 1: Standalone Windows Release (No Godot Required — Recommended)
+Download the pre-compiled standalone release directly from GitHub:
+- **Direct Link**: **[Download Latest Release (v1.0)](https://github.com/sreeharsx/useless_project_temp/releases)**
+
+**Release Package Contents:**
+| File | Description |
+|---|---|
+| `vallipidutham.exe` (~100 MB) | **Main Game Executable**: Double-click to launch and play directly. |
+| `vallipidutham.pck` (~14 MB) | **Game Resource Pack**: Contains all 10 levels, Malayalam voice acting, sounds, and assets. *(Must remain in the same folder as the `.exe`)* |
+| `vallipidutham.console.exe` (~161 KB) | **Debug Launcher**: Optional launcher that opens a command-line terminal alongside the game to view debug logs. |
+
+**Installation Steps:**
+1. Head to **[Releases](https://github.com/sreeharsx/useless_project_temp/releases)** and download **`vallipidutham.zip`** (or download the files directly).
+2. Right-click `vallipidutham.zip` and select **Extract All...** to any folder on your computer (e.g. Desktop or Downloads).
+3. Ensure that `vallipidutham.exe` and `vallipidutham.pck` are located in the **same directory**.
+
+---
+
+#### 🛠️ Option 2: Run from Source (For Developers)
 1. Clone this repository:
    ```bash
    git clone https://github.com/sreeharsx/useless_project_temp.git
@@ -46,11 +67,20 @@ We built a game literally based on the Malayalam idiom **"വള്ളിപി�
    ```
 2. Download and install **Godot Engine 4.x** (Standard 64-bit) from [godotengine.org](https://godotengine.org/).
 
-#### Run
-1. Launch Godot Engine.
-2. Click **Import**, browse to the project folder, and select `project.godot`.
+---
+
+# Run
+
+#### 🎮 To Play the Standalone Game:
+1. Navigate to your extracted folder.
+2. Double-click **`vallipidutham.exe`** to start playing immediately!
+3. *(Optional)* If you need to view developer logs or error output, launch **`vallipidutham.console.exe`**.
+
+#### 🛠️ To Run with Godot Editor:
+1. Open Godot Engine 4.x.
+2. Click **Import**, browse to the cloned `useless_project_temp` folder, and select `project.godot`.
 3. Click **Import & Edit**.
-4. Press **F5** (or click the **Play** button in the top right) to run the game!
+4. Press **F5** (or click the **Play** button in the top right) to run the project.
 
 ---
 
