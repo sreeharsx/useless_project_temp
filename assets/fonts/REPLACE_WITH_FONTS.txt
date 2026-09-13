@@ -1,0 +1,5 @@
+## Font placeholder — replace with Manjari or Chilanka OTF/TTF files.
+## Download from Google Fonts:
+##   Manjari: https://fonts.google.com/specimen/Manjari
+##   Chilanka: https://fonts.google.com/specimen/Chilanka
+## Place the .ttf files in this folder and create a FontFile resource in Godot.

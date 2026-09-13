@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://huddscene"]
+
+[ext_resource type="Script" path="res://scenes/ui/HUD.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+layer = 10
+
+[node name="LevelLabel" type="Label" parent="."]
+anchors_preset = 1
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 200.0
+offset_bottom = 48.0
+text = "Level 1"
+theme_override_font_sizes/font_size = 22
+
+[node name="PaniKittiContainer" type="HBoxContainer" parent="."]
+anchors_preset = 2
+anchor_left = 0.0
+anchor_top = 0.0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 340.0
+offset_bottom = 82.0
+
+[node name="PaniKittiLabel" type="Label" parent="PaniKittiContainer"]
+text = "പണി കിട്ടി × 0"
+theme_override_font_sizes/font_size = 18
+
+[node name="PopupContainer" type="Control" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.15
+anchor_right = 0.5
+anchor_bottom = 0.15
+offset_left = -200.0
+offset_top = 0.0
+offset_right = 200.0
+offset_bottom = 50.0
+modulate = Color(1, 1, 1, 0)
+
+[node name="PopupLabel" type="Label" parent="PopupContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = ""
+theme_override_font_sizes/font_size = 28

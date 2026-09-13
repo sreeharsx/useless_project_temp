@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://playerhand"]
+
+[ext_resource type="Script" path="res://scenes/player/PlayerHand.gd" id="1_ph"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 18.0
+
+[node name="PlayerHand" type="RigidBody2D"]
+script = ExtResource("1_ph")
+gravity_scale = 1.0
+continuous_cd = 1
+contact_monitor = true
+max_contacts_reported = 4
+collision_layer = 2
+collision_mask = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.95, 0.7, 0.4, 1)
+scale = Vector2(0.5, 0.5)
+
+[node name="SlingshotAnchor" type="Marker2D" parent="."]
+position = Vector2(0, 0)
+
+[node name="TrajectoryLine" type="Line2D" parent="."]
+width = 2.0
+default_color = Color(1, 1, 0.3, 0.6)
+antialiased = true
+
+[node name="ElasticBand" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0, 0, 0)
+width = 4.0
+default_color = Color(0.6, 0.35, 0.1, 1)
+antialiased = true
+
+[node name="ResetTimer" type="Timer" parent="."]
+wait_time = 1.5
+one_shot = true

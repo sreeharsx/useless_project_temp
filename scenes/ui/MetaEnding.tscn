@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=3 uid="uid://metaending"]
+
+[ext_resource type="Script" path="res://scenes/ui/MetaEnding.gd" id="1_me"]
+
+[node name="MetaEnding" type="CanvasLayer"]
+script = ExtResource("1_me")
+layer = 100
+
+[node name="BlackOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0)
+
+[node name="TerminalWindow" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -260.0
+offset_right = 380.0
+offset_bottom = 260.0
+visible = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TerminalWindow"]
+layout_mode = 2
+
+[node name="TitleBar" type="HBoxContainer" parent="TerminalWindow/VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+
+[node name="TitleLabel" type="Label" parent="TerminalWindow/VBoxContainer/TitleBar"]
+size_flags_horizontal = 3
+text = "  VALLI_PIDUTHAM.exe — Engine Error"
+theme_override_colors/font_color = Color(0.1, 1.0, 0.2)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TerminalWindow/VBoxContainer"]
+custom_minimum_size = Vector2(0, 320)
+
+[node name="TerminalText" type="RichTextLabel" parent="TerminalWindow/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+theme_override_colors/default_color = Color(0.1, 1.0, 0.2)
+theme_override_font_sizes/normal_font_size = 14
+
+[node name="ScoreLine" type="Label" parent="TerminalWindow/VBoxContainer"]
+visible = false
+text = ""
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1.0, 0.85, 0.2)
+theme_override_font_sizes/font_size = 18
+
+[node name="RestartBtn" type="Button" parent="TerminalWindow/VBoxContainer"]
+visible = false
+text = "[ RESTART — Try again? Njan paranjollo... ]"
+custom_minimum_size = Vector2(0, 48)
