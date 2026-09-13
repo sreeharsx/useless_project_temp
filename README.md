@@ -153,6 +153,7 @@ ANY ──[Consecutive Misses]──► TAUNT (Mocking Shakes)
 
 ### Screenshots
 
+
 1. **Main Menu**: Malayalam title "വള്ളിപിടുത്തം" with animated vine background.
  <img width="1283" height="753" alt="MENU" src="https://github.com/user-attachments/assets/3154d18b-e23f-4c29-b079-56fd17acb903" />
 2. **Gameplay**: Slingshot aiming with elastic band, Kerala rubber trees, and glassmorphic HUD.
@@ -161,10 +162,8 @@ ANY ──[Consecutive Misses]──► TAUNT (Mocking Shakes)
 
 
 3. **Level 10 Victory Screen**: Golden Valli trophy with celebratory stats and Malayalam victory banner.
+<img width="1543" height="907" alt="won" src="https://github.com/user-attachments/assets/825e9d6d-a37f-46d4-a02b-55974b0e68b5" />
 
-
-Njangal polum kandittilla....🥲
----
 
 ## Team Contributions
 - **Sreeharsh G**: Game design, Godot physics engine integration, slingshot mechanics, Valli AI state machine, level hazard implementations, and audio management pipeline.
