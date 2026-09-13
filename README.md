@@ -186,17 +186,16 @@ When the Golden Valli is caught:
 
 
 
-# [Project Name] 🎯
+# VALLIPIDUTHAM 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: Error 404
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Member 1: Sreeharsh G - Mar Athanasius College of Engineering Kothamangalam
+- Member 2: Meera V R -  Mar Athanasius College of Engineering Kothamangalam
 
 ### Project Description
 [2-3 lines about what your project does]
